@@ -83,7 +83,7 @@ export default function Ums() {
             <div className="card-body">
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">User: {user.username}</h5>
-                <h6>Access: Root</h6>
+                <h6>Access: {user.access}</h6>
               </div>
               <p className="card-text">Password: {user.password}</p>
               <div className="d-flex justify-content-end pt-2 border-top">
