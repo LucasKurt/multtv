@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import api from '../../services'
 
 export default function Oms() {
-  const [users, setUsers] = useState();
+  const [operation, setOperation] = useState();
   const [status, setStatus] = useState(false);
   const [values, setValues] = useState({iptv: ''});
 
   useEffect(() => {
     api.get('/iptv')
       .then((response) => {
-        setUsers(response.data)
+        setOperation(response.data)
       })
   }, [status]);
 
@@ -57,7 +57,7 @@ export default function Oms() {
       </form>
 
       <div className="mt-3">
-        {users?.map(user => (
+        {operation?.map(user => (
           <div key={user.id} className="card mb-2 shadow-sm">
             <div className="card-body">
               <div className="d-flex justify-content-between">
