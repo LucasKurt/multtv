@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"
 
 import './styles.css';
-
 import logo from '../../assets/img/Round - 100x100.png';
 
 const Login = () => {
   const [values, setValues] = useState({ username: '', password: '' });
+  const navigate = useNavigate();
 
   function onChange(e) {
     const { name, value } = e.target
@@ -19,25 +20,33 @@ const Login = () => {
     e.preventDefault()
 
     if (values.password === "123456") {
-      
+
       switch (values.username) {
         case "Root":
-          localStorage.setItem("token","Root")
+          localStorage.setItem("token", "Root")
+          navigate("/ams")
           break;
 
         case "Operador Ativo":
-          localStorage.setItem("token","Operador Ativo")
+          localStorage.setItem("token", "Operador Ativo")
+          navigate("/sms")
           break;
-        
+
         case "Operador Signal":
-          localStorage.setItem("token","Operador Signal")
+          localStorage.setItem("token", "Operador Signal")
+          navigate("/oms")
           break;
-      
+
         default:
           break;
       }
     }
   }
+
+  useEffect(() => {
+    localStorage.getItem("token") && navigate('/oms')
+  }, [navigate]);
+
 
   return (
     <div className="login text-center d-flex">
