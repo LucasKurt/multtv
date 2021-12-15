@@ -4,7 +4,7 @@ import brand from "../../assets/img/BANNER_200_100.jpg"
 
 function NavBar() {
   const navigate = useNavigate()
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token").split(",")
   function onClick() {
     localStorage.removeItem("token")
     navigate("/")
@@ -19,10 +19,10 @@ function NavBar() {
         </button>
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav me-auto">
-            {token === "Root" && <Link className="nav-link active" aria-current="page" to="/ams">AMS</Link>}
-            {token === "Root" && <Link className="nav-link active" aria-current="page" to="/ums">UMS</Link>}
-            {(token === "Root" || token === "Operador Ativo") && <Link className="nav-link active" aria-current="page" to="/sms">SMS</Link>}
-            {token && <Link className="nav-link active" aria-current="page" to="/oms">OMS</Link>}
+            {token.includes("ams") && <Link className="nav-link active" aria-current="page" to="/ams">AMS</Link>}
+            {token.includes("ums") && <Link className="nav-link active" aria-current="page" to="/ums">UMS</Link>}
+            {token.includes("sms") && <Link className="nav-link active" aria-current="page" to="/sms">SMS</Link>}
+            {token.includes("oms") && <Link className="nav-link active" aria-current="page" to="/oms">OMS</Link>}
           </div>
           {token && <button className='btn btn-outline-danger' onClick={onClick}>Log out</button>}
         </div>

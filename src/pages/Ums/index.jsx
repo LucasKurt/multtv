@@ -24,6 +24,16 @@ export default function Ums() {
     })
   }
 
+  function editUser(user) {
+    setEdit(true); 
+    setEditID(user.id); 
+    setValues({ username: user.username, password: user.password })
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+  }
+
   function onSubmit(e) {
     e.preventDefault()
 
@@ -83,11 +93,10 @@ export default function Ums() {
             <div className="card-body">
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">User: {user.username}</h5>
-                <h6>Access: {user.access}</h6>
               </div>
               <p className="card-text">Password: {user.password}</p>
               <div className="d-flex justify-content-end pt-2 border-top">
-                <button className="btn btn-outline-primary me-2" onClick={() => { setEdit(true); setEditID(user.id); setValues({ username: user.username, password: user.password }) }}>Edit</button>
+                <button className="btn btn-outline-primary me-2" onClick={() => editUser(user)}>Edit</button>
                 <button className="btn btn-outline-danger" onClick={() => deleteUser(user.id)}>Delete</button>
               </div>
             </div>

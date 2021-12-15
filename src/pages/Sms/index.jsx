@@ -20,6 +20,10 @@ export default function Sms() {
   function changeStatus(id) {
     setEdit(true)
     setEditID(id)
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
   }
 
   function onChange(e) {

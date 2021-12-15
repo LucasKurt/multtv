@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 
+import api from '../../services'
+
 import './styles.css';
 import logo from '../../assets/img/Round - 100x100.png';
 
@@ -19,32 +21,19 @@ const Login = () => {
   function onSubmit(e) {
     e.preventDefault()
 
-    if (values.password === "123456") {
-
-      switch (values.username) {
-        case "Root":
-          localStorage.setItem("token", "Root")
-          navigate("/ams")
-          break;
-
-        case "Operador Ativo":
-          localStorage.setItem("token", "Operador Ativo")
-          navigate("/sms")
-          break;
-
-        case "Operador Signal":
-          localStorage.setItem("token", "Operador Signal")
-          navigate("/oms")
-          break;
-
-        default:
-          break;
-      }
+    if (values.username === "user" && values.password === "123456") {
+      api.get('/users')
+        .then((response) => {
+          let user = response.data[0]
+          localStorage.setItem("token", user.permissions)
+          navigate(`/${user.permissions[0]}`)
+        })
     }
   }
 
   useEffect(() => {
-    localStorage.getItem("token") && navigate('/oms')
+    let token = localStorage.getItem("token")
+    token && navigate(`/${token.substring(0,3)}`)
   }, [navigate]);
 
 

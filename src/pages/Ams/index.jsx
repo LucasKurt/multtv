@@ -7,7 +7,7 @@ export default function Ams() {
   const [status, setStatus] = useState(false);
   const [edit, setEdit] = useState(false);
   const [editId, setEditID] = useState(0);
-  const [values, setValues] = useState({ access: "Operador Signal" });
+  const [values, setValues] = useState([]);
 
   useEffect(() => {
     api.get('/users')
@@ -19,40 +19,92 @@ export default function Ams() {
   function editAccess(id) {
     setEdit(true)
     setEditID(id)
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
   }
 
   function onChange(e) {
-    setValues({ access: e.target.value })
+    const { value, checked } = e.target
+
+    if (checked && !values.includes(value)) {
+      setValues([...values, value])
+    }
+
+    if (!checked && values.includes(value)) {
+      let arr = values.filter(e => e !== value)
+      setValues([...arr])
+    }
   }
 
   function onSubmit(e) {
     e.preventDefault()
 
     if (edit) {
-      api.put(`/users/${editId}`, values)
+      api.put(`/users/${editId}`, { permissions: values })
         .then(() => {
-          setStatus(!status)          
-          setValues({ access: "Operador Signal" })
+          setStatus(!status)
+          setValues([])
           setEdit(false)
         })
     }
   }
+
+  const permissions = [
+    {
+      permission: "ams",
+      label: "Permitir acesso ao módulo AMS"
+    },
+    {
+      permission: "ums",
+      label: "Permitir acesso ao módulo UMS"
+    },
+    {
+      permission: "sms",
+      label: "Permitir acesso ao módulo SMS"
+    },
+    {
+      permission: "oms",
+      label: "Permitir acesso ao módulo OMS"
+    },
+    {
+      permission: "cms",
+      label: "Permitir acesso ao módulo CMS"
+    },
+    {
+      permission: "crm",
+      label: "Permitir acesso ao módulo CRM"
+    },
+    {
+      permission: "pms",
+      label: "Permitir acesso ao módulo PMS"
+    },
+  ]
 
   return (
     <div className="container mt-1">
       <h1>Authorization Management System</h1>
 
       {edit && <form onSubmit={onSubmit} className="d-flex">
-        <div className="d-flex flex-column">
-          <div className="col">
-            <label htmlFor="access" className="form-label">Access {users[editId - 1].username}</label>
-            <select className="form-select" id="access" name="access" onChange={onChange} value={values.access}>
-              <option defaultValue="Operador Signal">Operador Signal</option>
-              <option value="Operador Ativo">Operador Ativo</option>
-              <option value="Root">Root</option>
-            </select>
-          </div>
-          <div className="d-flex mt-2">
+        <div className="d-flex flex-column p-2 border shadow-sm">
+          <p className="mb-0">Access {users[editId - 1].username}</p>
+          {permissions.map((permission, key) => (
+            <div key={key} className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                name="permissions"
+                id={permission.permission}
+                value={permission.permission}
+                onChange={onChange}
+              />
+              <label className="form-check-label" htmlFor={permission.permission}>
+                {permission.label}
+              </label>
+            </div>
+          ))}
+          <div className="d-flex">
             <button className="btn btn-outline-danger my-auto me-2" onClick={() => { setEdit(false) }}>Exit</button>
             <button type="submit" className="btn btn-outline-primary my-auto">Save changes</button>
           </div>
@@ -65,10 +117,14 @@ export default function Ams() {
             <div className="card-body">
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">User: {user.username}</h5>
-                <h6>Access: {user.access}</h6>
+                <h6>
+                  Permissions:{" "}
+                  {user.permissions.map((permission, key) => (
+                    <span key={key}>{permission} </span>
+                  ))}
+                </h6>
               </div>
-              <p className="card-text">Password: {user.password}</p>
-              <div className="d-flex justify-content-between pt-2 border-top">
+              <div className="d-flex justify-content-between pt-2 border-top mt-2">
                 <button className="btn btn-outline-primary mt-auto me-2" onClick={() => editAccess(user.id)}>Edit access</button>
               </div>
             </div>
