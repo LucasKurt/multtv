@@ -80,7 +80,7 @@ export default function Ams() {
       permission: "pms",
       label: "Permitir acesso ao módulo PMS"
     },
-  ]
+  ] 
 
   return (
     <div className="container mt-1">
@@ -98,6 +98,7 @@ export default function Ams() {
                 id={permission.permission}
                 value={permission.permission}
                 onChange={onChange}
+                // checked={users ? users[editId - 1].permissions.includes(permission.permission) : ''}
               />
               <label className="form-check-label" htmlFor={permission.permission}>
                 {permission.label}
