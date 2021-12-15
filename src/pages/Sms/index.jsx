@@ -69,7 +69,7 @@ export default function Sms() {
             <div className="card-body">
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">Operation: {user.iptv}</h5>
-                <h6>Status: {user.status?'active':'inative'}</h6>
+                <h6>Status: {user.status?'active':'inactive'}</h6>
               </div>
               <div className="d-flex justify-content-start pt-2 border-top">
                 <button className="btn btn-outline-primary" onClick={() => changeStatus(user.id)}>Change status</button>
