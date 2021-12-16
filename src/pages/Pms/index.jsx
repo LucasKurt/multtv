@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import api from '../../services'
 
-export default function Crm() {
+export default function Pms() {
   const [subscribers, setSubscribers] = useState();
   const [status, setStatus] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -84,7 +84,7 @@ export default function Crm() {
         </div>
         <div className="col-md"><hr /></div>
         <div className="col-12">
-          {!edit && <button className="btn btn-outline-secondary ">Add subscriber</button>}
+          {!edit && <button className="btn btn-outline-secondary ">Create user</button>}
           {edit &&
             <div className="d-flex">
               <button className="btn btn-outline-secondary me-2">Update user {subscribers[editId - 1].username}</button>

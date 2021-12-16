@@ -25,6 +25,7 @@ function NavBar() {
             {token?.includes("oms") && <Link className="nav-link active" aria-current="page" to="/oms">OMS</Link>}
             {token?.includes("cms") && <Link className="nav-link active" aria-current="page" to="/cms">CMS</Link>}
             {token?.includes("crm") && <Link className="nav-link active" aria-current="page" to="/crm">CRM</Link>}
+            {token?.includes("pms") && <Link className="nav-link active" aria-current="page" to="/pms">PMS</Link>}
           </div>
           {token && <button className='btn btn-outline-danger' onClick={onClick}>Log out</button>}
         </div>

@@ -5,6 +5,7 @@ import Cms from './pages/Cms';
 import Crm from './pages/Crm';
 import Login from './pages/Login';
 import Oms from './pages/Oms';
+import Pms from './pages/Pms';
 import Sms from './pages/Sms';
 import Ums from './pages/Ums';
 
@@ -24,6 +25,7 @@ export default function MainRoutes() {
       <Route path="/oms" element={<PrivateRoute permission={"oms"} redirectTo={"/"} ><Oms /></PrivateRoute>} />
       <Route path="/cms" element={<PrivateRoute permission={"cms"} redirectTo={"/"} ><Cms /></PrivateRoute>} />
       <Route path="/crm" element={<PrivateRoute permission={"crm"} redirectTo={"/"} ><Crm /></PrivateRoute>} />
+      <Route path="/pms" element={<PrivateRoute permission={"pms"} redirectTo={"/"} ><Pms /></PrivateRoute>} />
     </Routes>
   );
 }
