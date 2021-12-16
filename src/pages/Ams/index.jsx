@@ -1,13 +1,36 @@
 import { useState, useEffect } from "react";
 
 import api from '../../services'
+import ToggleSwitch from '../../components/ToggleSwitch';
+
+const initialState = {
+  ams: false,
+  ums: false,
+  sms: false,
+  oms: false,
+  cms: false,
+  crm: false,
+  pms: false,
+}
+
+const obj = {
+  ams: false,
+  ums: false,
+  sms: false,
+  oms: false,
+  cms: false,
+  crm: false,
+  pms: false,
+}
 
 export default function Ams() {
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState([]);
   const [status, setStatus] = useState(false);
   const [edit, setEdit] = useState(false);
   const [editId, setEditID] = useState(0);
   const [values, setValues] = useState([]);
+  const [isChecked, setIsChecked] = useState(initialState);
+  const [rootChecked, setRootChecked] = useState(false);
 
   useEffect(() => {
     api.get('/users')
@@ -16,7 +39,36 @@ export default function Ams() {
       })
   }, [status]);
 
+  useEffect(() => {
+    let valid = true
+    for (const key in isChecked) {
+      if (!isChecked[key]) {
+        setRootChecked(false)
+        valid = false
+        break
+      }
+    }
+    valid && setRootChecked(true)
+  }, [isChecked]);
+
   function editAccess(id) {
+    const editCheck = {
+      ams: false,
+      ums: false,
+      sms: false,
+      oms: false,
+      cms: false,
+      crm: false,
+      pms: false,
+    }
+    for (let key in editCheck) {
+      for (const permission of users[id - 1].permissions) {
+        if (key === permission) {
+          editCheck[key] = true
+        }
+      }
+    }
+    setIsChecked(editCheck)
     setEdit(true)
     setEditID(id)
     window.scrollTo({
@@ -25,8 +77,30 @@ export default function Ams() {
     })
   }
 
+  function rootClick(e) {
+    if (e.target.checked) {
+      for (let key in obj) {
+        obj[key] = true
+      }
+    } else {
+      for (let key in obj) {
+        obj[key] = false
+      }
+    }
+  }
+
+  function rootChange(e) {
+    setIsChecked(obj)
+    setRootChecked(e.target.checked)
+  }
+
   function onChange(e) {
     const { value, checked } = e.target
+
+    setIsChecked({
+      ...isChecked,
+      [value]: checked
+    })
 
     if (checked && !values.includes(value)) {
       setValues([...values, value])
@@ -50,6 +124,8 @@ export default function Ams() {
         })
     }
   }
+
+
 
   const permissions = [
     {
@@ -80,7 +156,7 @@ export default function Ams() {
       permission: "pms",
       label: "Permitir acesso ao módulo PMS"
     },
-  ] 
+  ]
 
   return (
     <div className="container mt-1">
@@ -89,20 +165,30 @@ export default function Ams() {
       {edit && <form onSubmit={onSubmit} className="d-flex">
         <div className="d-flex flex-column p-2 border shadow-sm">
           <p className="mb-0">Access {users[editId - 1].username}</p>
+          <div className="d-flex">
+            <ToggleSwitch
+              name="root"
+              id="root"
+              onChange={rootChange}
+              onClick={rootClick}
+              checked={rootChecked}
+            />
+            <p className="ms-2 form-check-label">
+              Root
+            </p>
+          </div>
           {permissions.map((permission, key) => (
-            <div key={key} className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
+            <div key={key} className="d-flex">
+              <ToggleSwitch
                 name="permissions"
                 id={permission.permission}
                 value={permission.permission}
                 onChange={onChange}
-                // checked={users ? users[editId - 1].permissions.includes(permission.permission) : ''}
+                checked={isChecked[permission.permission]}
               />
-              <label className="form-check-label" htmlFor={permission.permission}>
+              <p className="ms-2 form-check-label">
                 {permission.label}
-              </label>
+              </p>
             </div>
           ))}
           <div className="d-flex">
