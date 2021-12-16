@@ -24,38 +24,58 @@ export default function Pms() {
     api.get('/channels')
       .then((response) => {
         setChannels(response.data)
+        const arr = response.data?.map(channel => [channel.name, false])
+        const initialState = Object.fromEntries(arr)
+        setIsChecked({ ...initialState })
       })
   }, [status]);
 
-  const arr = channels.map(channel => [channel.name, false])
-  const initialState = Object.fromEntries(arr)
-  //const obj = Object.fromEntries(arr)
-
-  function onClick() {
-    setIsChecked({ ...initialState })
-  }  
-  
-  console.log(isChecked)
-
   function onChange(e) {
-    const { name, value, checked } = e.target
-
+    const { value, checked, name, id } = e.target
 
     setIsChecked({
       ...isChecked,
       [value]: checked
     })
 
-    setValues({
-      ...values,
-      [name]: value
-    })
+    if (id === "name" || id === "type") {
+      setValues({
+        ...values,
+        [name]: value
+      })
+    } else {
+      if (checked && !values.channelList.includes(value)) {
+        setValues({
+          ...values,
+          [name]: [...values.channelList, value]
+        })
+      }
+
+      if (!checked && values.channelList.includes(value)) {
+        let arr = values.channelList.filter(e => e !== value)
+        setValues({
+          ...values,
+          [name]: [...arr]
+        })
+      }
+    }
+
   }
 
-  function editTvPlan(subscribers) {
+  function editTvPlan(tvPlan) {
+    const arr = channels?.map(channel => [channel.name, false])
+    const obj = Object.fromEntries(arr)
+    for (const key in obj) {
+      for (const channel of tvPlan.channelList) {
+        if(key === channel){
+          obj[key] = true
+        }
+      }
+    }
     setEdit(true);
-    setEditID(subscribers.id);
-    setValues({ name: subscribers.name, password: subscribers.password, status: '' })
+    setEditID(tvPlan.id);
+    setIsChecked(obj)
+    setValues({ name: tvPlan.name, type: tvPlan.type, channelList: tvPlan.channelList })
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -110,35 +130,29 @@ export default function Pms() {
           </select>
         </div>
         <div className="col-md-2 mt-5 d-flex align-items-end">
-          {/* <label htmlFor="status" className="form-label">Channel list</label>
-          <select className="form-select" id="status" name="status" onChange={onChange} value={values.status}>
-            <option defaultValue={false}>Inactive</option>
-            <option value={true}>Active</option>
-          </select> */}
 
-          <Dropdown className="form-label bg-white" autoClose="outside" onClick={onClick}>
+          <Dropdown className="form-label bg-white" autoClose="outside" >
             <Dropdown.Toggle variant="secondary" id="dropdown-basic">
               Channel list
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
               {channels?.map((channels, key) => (
-                <Dropdown.Item key={key}>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name="channels"
-                      id={channels.name}
-                      value={channels.name}
-                      onChange={onChange}
-                    //checked={isChecked[channels.name]}
-                    />
-                    <label className="form-check-label" htmlFor={channels.name}>
-                      {channels.name}
-                    </label>
-                  </div>
-                </Dropdown.Item>
+                <div key={key} className="form-check ms-2">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="channelList"
+                    id={channels.name}
+                    value={channels.name}
+                    onChange={onChange}
+                    checked={isChecked[channels.name]}
+                  />
+                  <label className="form-check-label" htmlFor={channels.name}>
+                    {channels.name}
+                  </label>
+                </div>
+
               ))}
             </Dropdown.Menu>
           </Dropdown>
@@ -164,7 +178,9 @@ export default function Pms() {
                 <h5 className="card-title">TV plan: {tvPlan.name}</h5>
                 <h6>Type: {tvPlan.type}</h6>
               </div>
-              <p className="card-text">Channel list: {tvPlan.channelList}</p>
+              <p className="card-text">Channel list: {tvPlan.channelList.map((channel, key) => (
+                <span key={key}>{channel} </span>
+              ))}</p>
               <div className="d-flex justify-content-end pt-2 border-top">
                 <button className="btn btn-outline-primary me-2" onClick={() => editTvPlan(tvPlan)}>Edit</button>
                 <button className="btn btn-outline-danger" onClick={() => deleteTvPlan(tvPlan.id)}>Delete</button>

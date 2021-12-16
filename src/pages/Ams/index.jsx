@@ -13,15 +13,36 @@ const initialState = {
   pms: false,
 }
 
-const obj = {
-  ams: false,
-  ums: false,
-  sms: false,
-  oms: false,
-  cms: false,
-  crm: false,
-  pms: false,
-}
+const permissions = [
+  {
+    permission: "ams",
+    label: "Permitir acesso ao módulo AMS"
+  },
+  {
+    permission: "ums",
+    label: "Permitir acesso ao módulo UMS"
+  },
+  {
+    permission: "sms",
+    label: "Permitir acesso ao módulo SMS"
+  },
+  {
+    permission: "oms",
+    label: "Permitir acesso ao módulo OMS"
+  },
+  {
+    permission: "cms",
+    label: "Permitir acesso ao módulo CMS"
+  },
+  {
+    permission: "crm",
+    label: "Permitir acesso ao módulo CRM"
+  },
+  {
+    permission: "pms",
+    label: "Permitir acesso ao módulo PMS"
+  },
+]
 
 export default function Ams() {
   const [users, setUsers] = useState([]);
@@ -31,6 +52,8 @@ export default function Ams() {
   const [values, setValues] = useState([]);
   const [isChecked, setIsChecked] = useState(initialState);
   const [rootChecked, setRootChecked] = useState(false);
+
+  console.log(initialState)
 
   useEffect(() => {
     api.get('/users')
@@ -52,30 +75,24 @@ export default function Ams() {
   }, [isChecked]);
 
   function editAccess(id) {
-    const editCheck = {
-      ams: false,
-      ums: false,
-      sms: false,
-      oms: false,
-      cms: false,
-      crm: false,
-      pms: false,
+    for (let key in initialState) {
+      initialState[key] = false
     }
-    for (let key in editCheck) {
+    for (let key in initialState) {
       for (const permission of users[id - 1].permissions) {
         if (key === permission) {
-          editCheck[key] = true
+          initialState[key] = true
         }
       }
     }
     let arr = []
-    for (const key in editCheck) {
-      if (editCheck[key]) {
+    for (const key in initialState) {
+      if (initialState[key]) {
         arr.push(key)
       }
     }
     setValues([...arr])
-    setIsChecked({ ...editCheck })
+    setIsChecked({ ...initialState })
     setEdit(true)
     setEditID(id)
     window.scrollTo({
@@ -86,22 +103,22 @@ export default function Ams() {
 
   function rootClick(e) {
     if (e.target.checked) {
-      for (let key in obj) {
-        obj[key] = true
+      for (let key in initialState) {
+        initialState[key] = true
       }
     } else {
-      for (let key in obj) {
-        obj[key] = false
+      for (let key in initialState) {
+        initialState[key] = false
       }
     }
   }
 
   function rootChange(e) {
-    setIsChecked(obj)
+    setIsChecked(initialState)
     setRootChecked(e.target.checked)
     if (e.target.checked) {
       let arr = []
-      for (const key in obj) {
+      for (const key in initialState) {
         arr.push(key)
       }
       setValues(arr)
@@ -142,36 +159,7 @@ export default function Ams() {
     }
   }
 
-  const permissions = [
-    {
-      permission: "ams",
-      label: "Permitir acesso ao módulo AMS"
-    },
-    {
-      permission: "ums",
-      label: "Permitir acesso ao módulo UMS"
-    },
-    {
-      permission: "sms",
-      label: "Permitir acesso ao módulo SMS"
-    },
-    {
-      permission: "oms",
-      label: "Permitir acesso ao módulo OMS"
-    },
-    {
-      permission: "cms",
-      label: "Permitir acesso ao módulo CMS"
-    },
-    {
-      permission: "crm",
-      label: "Permitir acesso ao módulo CRM"
-    },
-    {
-      permission: "pms",
-      label: "Permitir acesso ao módulo PMS"
-    },
-  ]
+  
 
   return (
     <div className="container mt-1">
