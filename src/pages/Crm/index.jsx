@@ -100,7 +100,7 @@ export default function Crm() {
             <div className="card-body">
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">Subscriber: {subscriber.name}</h5>
-                <h6>Status {subscriber.status?'active':'inactive'}</h6>
+                <h6>Status: {subscriber.status?'active':'inactive'}</h6>
               </div>
               <p className="card-text">Password: {subscriber.password}</p>
               <div className="d-flex justify-content-end pt-2 border-top">

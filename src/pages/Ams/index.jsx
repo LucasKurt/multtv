@@ -68,7 +68,14 @@ export default function Ams() {
         }
       }
     }
-    setIsChecked(editCheck)
+    let arr = []
+    for (const key in editCheck) {
+      if (editCheck[key]) {
+        arr.push(key)
+      }
+    }
+    setValues([...arr])
+    setIsChecked({ ...editCheck })
     setEdit(true)
     setEditID(id)
     window.scrollTo({
@@ -92,6 +99,16 @@ export default function Ams() {
   function rootChange(e) {
     setIsChecked(obj)
     setRootChecked(e.target.checked)
+    if (e.target.checked) {
+      let arr = []
+      for (const key in obj) {
+        arr.push(key)
+      }
+      setValues(arr)
+    } else {
+      let arr = []
+      setValues([...arr])
+    }
   }
 
   function onChange(e) {
@@ -124,8 +141,6 @@ export default function Ams() {
         })
     }
   }
-
-
 
   const permissions = [
     {

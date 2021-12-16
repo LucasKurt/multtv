@@ -1,30 +1,58 @@
 import { useState, useEffect } from "react";
+import { Dropdown } from 'react-bootstrap'
+import axios from "axios";
 
 import api from '../../services'
 
 export default function Pms() {
-  const [subscribers, setSubscribers] = useState();
+  const [tvPlans, setTvPlans] = useState([]);
+  const [channels, setChannels] = useState([]);
   const [status, setStatus] = useState(false);
   const [edit, setEdit] = useState(false);
   const [editId, setEditID] = useState(0);
-  const [values, setValues] = useState({ name: '', password: '', status: '' });
+  const [values, setValues] = useState({ name: '', type: '', channelList: [] });
+  const [isChecked, setIsChecked] = useState({});
 
   useEffect(() => {
-    api.get('/subscribers')
+    axios.get('https://61baa1f348df2f0017e5ab45.mockapi.io/tvPlans')
       .then((response) => {
-        setSubscribers(response.data)
+        setTvPlans(response.data)
       })
   }, [status]);
 
+  useEffect(() => {
+    api.get('/channels')
+      .then((response) => {
+        setChannels(response.data)
+      })
+  }, [status]);
+
+  const arr = channels.map(channel => [channel.name, false])
+  const initialState = Object.fromEntries(arr)
+  //const obj = Object.fromEntries(arr)
+
+  function onClick() {
+    setIsChecked({ ...initialState })
+  }  
+  
+  console.log(isChecked)
+
   function onChange(e) {
-    const { name, value } = e.target
+    const { name, value, checked } = e.target
+
+
+    setIsChecked({
+      ...isChecked,
+      [value]: checked
+    })
+
     setValues({
       ...values,
       [name]: value
     })
   }
 
-  function editSubscriber(subscribers) {
+  function editTvPlan(subscribers) {
     setEdit(true);
     setEditID(subscribers.id);
     setValues({ name: subscribers.name, password: subscribers.password, status: '' })
@@ -38,33 +66,35 @@ export default function Pms() {
     e.preventDefault()
 
     if (!edit) {
-      api.post('/subscribers', values)
+      axios.post('https://61baa1f348df2f0017e5ab45.mockapi.io/tvPlans', values)
         .then(() => {
           setStatus(!status)
-          setValues({ name: '', password: '', status: '' })
+          setValues({ name: '', type: '', channelList: [] })
         })
     } else {
-      api.put(`/subscribers/${editId}`, values)
+      axios.put(`https://61baa1f348df2f0017e5ab45.mockapi.io/tvPlans/${editId}`, values)
         .then(() => {
           setStatus(!status)
-          setValues({ name: '', password: '', status: '' })
+          setValues({ name: '', type: '', channelList: [] })
           setEdit(false)
         })
     }
 
   }
 
-  function deleteSubscriber(id) {
+  function deleteTvPlan(id) {
 
-    api.delete(`/subscribers/${id}`)
+    axios.delete(`https://61baa1f348df2f0017e5ab45.mockapi.io/tvPlans/${id}`)
       .then(() => {
         setStatus(!status)
       })
   }
 
+
+
   return (
     <div className="container mt-1">
-      <h1>Customer Relationship Management</h1>
+      <h1>Products Management System</h1>
 
       <form className="row g-3" onSubmit={onSubmit}>
         <div className="col-md-5">
@@ -72,22 +102,54 @@ export default function Pms() {
           <input type="text" className="form-control" id="name" name="name" value={values.name} onChange={onChange} />
         </div>
         <div className="col-md-5">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input type="text" className="form-control" id="password" name="password" value={values.password} onChange={onChange} />
+          <label htmlFor="type" className="form-label">Type</label>
+          <select className="form-select" id="type" name="type" onChange={onChange} value={values.type}>
+            <option defaultValue={"Small"}>Small</option>
+            <option value={"Medium"}>Medium</option>
+            <option value={"Big"}>Big</option>
+          </select>
         </div>
-        <div className="col-md-2">
-          <label htmlFor="status" className="form-label">Status</label>
+        <div className="col-md-2 mt-5 d-flex align-items-end">
+          {/* <label htmlFor="status" className="form-label">Channel list</label>
           <select className="form-select" id="status" name="status" onChange={onChange} value={values.status}>
             <option defaultValue={false}>Inactive</option>
             <option value={true}>Active</option>
-          </select>
+          </select> */}
+
+          <Dropdown className="form-label bg-white" autoClose="outside" onClick={onClick}>
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+              Channel list
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              {channels?.map((channels, key) => (
+                <Dropdown.Item key={key}>
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      name="channels"
+                      id={channels.name}
+                      value={channels.name}
+                      onChange={onChange}
+                    //checked={isChecked[channels.name]}
+                    />
+                    <label className="form-check-label" htmlFor={channels.name}>
+                      {channels.name}
+                    </label>
+                  </div>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+
         </div>
         <div className="col-md"><hr /></div>
         <div className="col-12">
-          {!edit && <button className="btn btn-outline-secondary ">Create user</button>}
+          {!edit && <button className="btn btn-outline-secondary ">Create TV plan</button>}
           {edit &&
             <div className="d-flex">
-              <button className="btn btn-outline-secondary me-2">Update user {subscribers[editId - 1].username}</button>
+              <button className="btn btn-outline-secondary me-2">Update plan {tvPlans[editId - 1].name}</button>
               <button className="btn btn-outline-warning" onClick={() => setEdit(false)}>Cancel</button>
             </div>
           }
@@ -95,17 +157,17 @@ export default function Pms() {
       </form>
 
       <div className="mt-3">
-        {subscribers?.map(subscriber => (
-          <div key={subscriber.id} className="card mb-2 shadow-sm">
+        {tvPlans?.map(tvPlan => (
+          <div key={tvPlan.id} className="card mb-2 shadow-sm">
             <div className="card-body">
               <div className="d-flex justify-content-between">
-                <h5 className="card-title">Subscriber: {subscriber.name}</h5>
-                <h6>Status {subscriber.status?'active':'inactive'}</h6>
+                <h5 className="card-title">TV plan: {tvPlan.name}</h5>
+                <h6>Type: {tvPlan.type}</h6>
               </div>
-              <p className="card-text">Password: {subscriber.password}</p>
+              <p className="card-text">Channel list: {tvPlan.channelList}</p>
               <div className="d-flex justify-content-end pt-2 border-top">
-                <button className="btn btn-outline-primary me-2" onClick={() => editSubscriber(subscriber)}>Edit</button>
-                <button className="btn btn-outline-danger" onClick={() => deleteSubscriber(subscriber.id)}>Delete</button>
+                <button className="btn btn-outline-primary me-2" onClick={() => editTvPlan(tvPlan)}>Edit</button>
+                <button className="btn btn-outline-danger" onClick={() => deleteTvPlan(tvPlan.id)}>Delete</button>
               </div>
             </div>
           </div>
